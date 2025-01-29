@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, PrivateRoute } from 'react-router-dom'
 import Message from './pages/Message';
 import Login from './pages/Login';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import PaymentLanding from './pages/LandingPage';
+import AudioBookDashboard from './pages/Dashboard';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -17,6 +19,8 @@ root.render(
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/message' element={<Message />} />
+        <Route path='/landing' element={<PaymentLanding />} />
+        <Route path='/dashboard' element={<AudioBookDashboard />} />
       </Routes>
     </BrowserRouter>
   </GoogleOAuthProvider>

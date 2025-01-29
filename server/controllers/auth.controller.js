@@ -5,7 +5,9 @@ const saveUserInfo = async (req, res) => {
         const { name, email, profilePic } = req.body;
         const getDB = await connectDB('payment');
         const db = getDB.connection.db;
+        console.log(db)
         const collection = db.collection('users');
+        console.log(collection)
         const existUser = await collection.findOne({ email })
         if(existUser){
             return res.status(201).json({ success: false, message: "User Already Exist"})

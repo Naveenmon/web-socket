@@ -3,7 +3,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import authRoute from './routes/auth.route.js';
-import mongoose from 'mongoose'
 
 
 const app = express();
@@ -30,8 +29,8 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("received_message", data)
     });
 
-    
 
+    
     socket.on("disconnect", () => {
         console.log(`User Disconnected: ${socket.id}`);
     });

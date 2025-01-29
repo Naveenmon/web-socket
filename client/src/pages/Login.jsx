@@ -16,7 +16,6 @@ const Login = () => {
     try {
       const decoded = jwtDecode(credentialResponse.credential); 
       setUserData(decoded);
-      console.log("User Data", userData)
       setCred(credentialResponse.credential); 
       setError('');
       await axios.post('http://localhost:3001/api/auth/login', {
