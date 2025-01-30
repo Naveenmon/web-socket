@@ -18,13 +18,16 @@ const Login = () => {
       setUserData(decoded);
       setCred(credentialResponse.credential); 
       setError('');
+      localStorage.setItem('email', decoded.email);
+      localStorage.setItem('name', decoded.name);
+      localStorage.setItem('profilePic', decoded.picture);
       await axios.post('http://localhost:3001/api/auth/login', {
         name: decoded.name,
         email: decoded.email,
         profilePic: decoded.picture
       }). then((res) => {
         console.log("User data", res.data);
-        navigate('/message')
+        navigate('/')
       }).catch((error) => { console.error('Error saving user data', error); setError('Failed to save user')})
     } catch (error) {
       setError('Failed to decode token');

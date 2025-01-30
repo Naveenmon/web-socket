@@ -3,6 +3,7 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import { ArrowRight, Headphones, BookOpen, Sparkles } from 'lucide-react';
 import lottie from '../assets/landing.json'
 import logo from '../assets/logo.png'
+import SubscriptionPlans from '../Components/SubscriptionPlans';
 
 const AudiobookLanding = () => {
   return (
@@ -11,7 +12,7 @@ const AudiobookLanding = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
-              <img src={logo} width={50} height={50} alt="" />
+              <img src={logo} width={45} height={45} alt="" />
               <span className="text-2xl p-2 font-bold">AudioVerse</span>
             </div>
             <div>
@@ -52,7 +53,7 @@ const AudiobookLanding = () => {
         </div>
       </div>
 
-      <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+      {/* <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -86,7 +87,8 @@ const AudiobookLanding = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <SubscriptionPlans />
     </div>
   );
 };
