@@ -1,140 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, CreditCard, History, X, ChevronRight, Activity } from 'lucide-react';
-import io from 'socket.io-client';
-import Header from '../Components/Header';
-import PaymentCard from '../Components/PaymentCard';
-import RecentActivity from '../Components/RecentActivity';
-import NotificationPopup from '../Components/NotificationPopup';
+import React, { useState } from 'react';
+import { MessageSquare, CreditCard, Menu, X, Bell, User } from 'lucide-react';
+import Message from '../Components/Message';
+import TransactionHistory from '../Components/TransactionHistory';
+import { Player } from '@lottiefiles/react-lottie-player';
+import lottieAnimation from '../assets/landing.json'; // 
 
+const DashboardLayout = () => {
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [currentRoute, setCurrentRoute] = useState('dashboard');
 
-// const NotificationPopup = ({ notifications, isOpen, onClose }) => {
-//   if (!isOpen) return null; 
-  
-
-//   return (
-//     <div className="absolute top-16 right-4 w-96 bg-white rounded-2xl shadow-xl z-50 max-h-[600px] border border-gray-100">
-//       <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-//         <div>
-//           <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
-//           <p className="text-sm text-gray-500">Recent updates</p>
-//         </div>
-//         <button 
-//           onClick={onClose}
-//           className="p-2 hover:bg-white rounded-full transition-colors"
-//         >
-//           <X size={16} />
-//         </button>
-//       </div>
-//       <div className="overflow-y-auto max-h-[400px] divide-y divide-gray-100">
-//         {notifications.length === 0 ? (
-//           <div className="p-6 text-center">
-//             <Bell size={24} className="text-gray-300 mx-auto mb-2" />
-//             <p className="text-gray-500">No new notifications</p>
-//           </div>
-//         ) : (
-//           notifications.map((notification) => (
-//             <div
-//               key={notification.id}
-//               className="p-4 hover:bg-gray-50 transition-colors"
-//             >
-//               <div className="flex items-start gap-3">
-//                 <div className={`p-2 rounded-full ${
-//                   notification.status === 'success' ? 'bg-green-100' : 'bg-blue-100'
-//                 }`}>
-//                   <Activity size={14} className={
-//                     notification.status === 'success' ? 'text-green-600' : 'text-blue-600'
-//                   } />
-//                 </div>
-//                 <div className="flex-1 min-w-0">
-//                   <p className="text-sm font-medium text-gray-800 truncate">{notification.message}</p>
-//                   <p className="text-xs text-gray-500 mt-1">#{notification.transactionId}</p>
-//                   <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-
-
-// Main Component
-const PaymentWebsite = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [socket, setSocket] = useState(null);
-
-  useEffect(() => {
-    const newSocket = io('http://localhost:3000');
-    setSocket(newSocket);
-
-    newSocket.on('transactionUpdate', (data) => {
-      addNotification(data);
-    });
-
-    return () => newSocket.disconnect();
-  }, []);
-
-  const addNotification = (data) => {
-    const newNotification = {
-      id: Date.now(),
-      message: data.message,
-      status: data.status,
-      transactionId: data.transactionId,
-      timestamp: new Date().toLocaleTimeString()
-    };
-    setNotifications(prev => [newNotification, ...prev]);
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
   };
 
-  const handlePayment = () => {
-    const transactionId = `TXN${Date.now()}`;
-    socket?.emit('initiatePayment', {
-      transactionId,
-      amount: 299.00,
-      timestamp: new Date().toISOString()
-    });
-    
-    setTimeout(() => {
-      addNotification({
-        message: 'Payment initiated successfully',
-        status: 'pending',
-        transactionId
-      });
-    }, 500);
-
-    setTimeout(() => {
-      addNotification({
-        message: 'Payment processed successfully',
-        status: 'success',
-        transactionId
-      });
-    }, 2000);
+  const renderContent = () => {
+    switch (currentRoute) {
+      case 'messages':
+        return <Message />;
+      case 'payments':
+        return <TransactionHistory />;
+      default:
+        return (
+            <div className="flex-1 bg-gray-50 p-8">
+              {/* Lottie Animation */}
+              <div className="mb-8">
+                <Player
+                  autoplay
+                  loop
+                  src={lottieAnimation}
+                  className="w-full max-w-md"
+                />
+              </div>
+              <h1 className="text-3xl font-bold text-center text-gray-900 mt-6">Welcome to Your Dashboard!</h1>
+            </div>
+          );
+         
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        onNotificationClick={() => setIsNotificationOpen(!isNotificationOpen)}
-        notificationCount={notifications.length}
-      />
-      
-      <main className="max-w-7xl mx-auto px-8 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <PaymentCard onPayment={handlePayment} />
-          <RecentActivity notifications={notifications} />
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        <div className="flex items-center justify-between p-4 border-b">
+          <h1 className="text-xl font-bold">Dashboard</h1>
+          <button onClick={toggleSidebar} className="lg:hidden">
+            <X className="h-6 w-6" />
+          </button>
         </div>
-      </main>
+        <nav className="p-4">
+          <button
+            onClick={() => setCurrentRoute('messages')}
+            className={`flex items-center space-x-3 w-full p-3 rounded-lg ${
+              currentRoute === 'messages' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
+            }`}
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span>Messages</span>
+          </button>
+          <button
+            onClick={() => setCurrentRoute('payments')}
+            className={`flex items-center space-x-3 w-full p-3 rounded-lg mt-2 ${
+              currentRoute === 'payments' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
+            }`}
+          >
+            <CreditCard className="h-5 w-5" />
+            <span>Payment History</span>
+          </button>
+        </nav>
+      </div>
 
-      <NotificationPopup
-        notifications={notifications}
-        isOpen={isNotificationOpen}
-        onClose={() => setIsNotificationOpen(false)}
-      />
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Navbar */}
+        <header className="bg-white shadow-sm">
+          <div className="flex items-center justify-between p-4">
+            <button onClick={toggleSidebar} className="lg:hidden">
+              <Menu className="h-6 w-6" />
+            </button>
+            <div className="flex items-center space-x-4">
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <Bell className="h-5 w-5" />
+              </button>
+              <button className="p-2 hover:bg-gray-100 rounded-full">
+                <User className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <main className="flex-1 overflow-auto flex justify-end">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   );
 };
 
-export default PaymentWebsite;
+export default DashboardLayout;

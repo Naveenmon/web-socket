@@ -1,8 +1,9 @@
 import express from 'express';
-import createOrder from '../controllers/payment.controller.js';
+import { createOrder, captureOrder } from '../controllers/payment.controller.js';
+
 const paymentRoute = express.Router();
 
 paymentRoute.post("/", createOrder)
-paymentRoute.post("/capture", createOrder)
+paymentRoute.post("/capture", captureOrder)
 
 export default paymentRoute;

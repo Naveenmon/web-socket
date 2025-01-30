@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { Check } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {
-
+  const navigate = useNavigate();
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -21,59 +22,61 @@ const SubscriptionPlans = () => {
   const handleSubscription = async () => {
     const email = localStorage.getItem('email');
     const name = localStorage.getItem('name');
-    await axios.post('http://localhost:3001/api/order/', {
-        email,
-        amount: 1499
-        }).then((res) => {
+
+    try {
+        const res = await axios.post('http://localhost:3001/api/order/', { email, amount: 1499 });
         console.log('Order created', res.data);
 
-        const razorpayKey = process.env.RAZORPAY_KEY_ID
+        const razorpayKey = process.env.RAZORPAY_KEY_ID;
         const amount = res.data.amount;
         const id = res.data.id;
         
         const options = {
-          key: razorpayKey, // Replace with your Razorpay key
-          amount: amount,
-          currency: "INR",
-          order_id: id,
-          handler: function (response) {
-            const paymentId = response.razorpay_payment_id;
-            const order_Id = response.razorpay_order_id;
-            console.log('Payment Response:', paymentId, order_Id);
-     
-            // Call your backend to capture the payment
-            axios.post(`http://localhost:3001/api/order/capture`, {
-              payment_id: paymentId,
-              order_id: id,
-              amount: amount * 100,
-            }, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-            .then(response => {
-              console.log('Payment captured successfully:', response.data);
-            })
-            .catch(error => {
-              console.error('Error capturing payment:', error);
-            });
-          },
-          prefill: {
-            name: name,
-            email: email,
-            contact: "9876543210",
-          },
-          theme: {
-            color: "#F37254",
-          }
-        }
+            key: razorpayKey, // Razorpay key
+            amount: amount,  // Amount in paise (e.g., 1499 INR = 149900 paise)
+            currency: "INR",
+            order_id: id,
+            handler: function (response) {
+                const paymentId = response.razorpay_payment_id;
+                const order_Id = response.razorpay_order_id;
+                console.log('Payment Response:', paymentId, order_Id);
 
-          const razorpay = new window.Razorpay(options)
-          razorpay.open()
-      }).catch((error) => {
-        console.error('Failed to create order', error);
-        });
-      }
+                // Call your backend to capture the payment
+                axios.post(`http://localhost:3001/api/order/capture`, {
+                    payment_id: paymentId,
+                    order_id: id,
+                    amount: amount,
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    console.log('Payment captured successfully:', response.data);
+                    navigate('/dashboard')
+                })
+                .catch(error => {
+                    console.error('Error capturing payment:', error.response ? error.response.data : error.message);
+                });
+            },
+            prefill: {
+                name: name,
+                email: email,
+                contact: "9876543210",  // Use actual contact number
+            },
+            theme: {
+                color: "#f58b8b",
+            }
+        };
+
+        const razorpay = new window.Razorpay(options);
+        razorpay.open();
+
+    } catch (error) {
+        console.error('Failed to create order', error.response ? error.response.data : error.message);
+    }
+};
+
 
   const plan = {
     name: 'Premium',
