@@ -1,108 +1,242 @@
-import React from 'react';
-import { Headphones } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, CreditCard, History, X, ChevronRight, Activity } from 'lucide-react';
+import io from 'socket.io-client';
 
-const AudioBookDashboard = () => {
+// NotificationPopup Component
+// Previous imports remain the same...
+
+// NotificationPopup Component
+const NotificationPopup = ({ notifications, isOpen, onClose }) => {
+  if (!isOpen) return null;
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 px-4">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="grid md:grid-cols-2 gap-8 p-8">
-          {/* Left Column - Book Cover */}
-          <div>
-            <div className="aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src="/api/placeholder/400/500"
-                alt="Book Cover"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Right Column - Book Details and Subscription */}
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                The Midnight Library
-              </h1>
-              <p className="text-gray-600 mb-4">By Matt Haig • Narrated by Carey Mulligan</p>
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center">
-                  <Headphones className="h-5 w-5 text-[#f6b092] mr-2" />
-                  <span className="text-gray-600">48k listeners</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="prose max-w-none text-gray-600">
-              <p>
-                Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived...
-              </p>
-            </div>
-
-            {/* Subscription Options */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900">Choose Your Plan</h3>
-              
-              <div className="border rounded-xl p-6 bg-gray-50 hover:border-[#f6b092] transition-colors cursor-pointer">
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Monthly Premium</h4>
-                    <p className="text-gray-600">Full access to our entire library</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">$14.99</p>
-                    <p className="text-sm text-gray-500">per month</p>
-                  </div>
-                </div>
-                <button className="w-full bg-[#f6b092] text-gray-800 py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-opacity">
-                  Start Premium
-                </button>
-              </div>
-
-              <div className="border rounded-xl p-6 hover:border-[#f6b092] transition-colors cursor-pointer">
-                <div className="flex justify-between items-center mb-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Annual Premium</h4>
-                    <p className="text-gray-600">Save 20% with yearly billing</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-gray-900">$143.88</p>
-                    <p className="text-sm text-gray-500">$11.99/month</p>
-                  </div>
-                </div>
-                <button className="w-full border-2 border-[#f6b092] text-gray-800 py-3 px-6 rounded-lg font-medium hover:bg-[#f6b092] transition-all">
-                  Choose Annual
-                </button>
-              </div>
-            </div>
-
-            <div className="border-t pt-6">
-              <h3 className="font-semibold text-gray-900 mb-2">All Plans Include:</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <svg className="h-5 w-5 text-[#f6b092] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Unlimited access to all audiobooks
-                </li>
-                <li className="flex items-center">
-                  <svg className="h-5 w-5 text-[#f6b092] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  High-quality audio (320kbps)
-                </li>
-                <li className="flex items-center">
-                  <svg className="h-5 w-5 text-[#f6b092] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Offline listening
-                </li>
-              </ul>
-            </div>
-          </div>
+    <div className="absolute top-16 right-4 w-96 bg-white rounded-2xl shadow-xl z-50 max-h-[600px] border border-gray-100">
+      <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
+          <p className="text-sm text-gray-500">Recent updates</p>
         </div>
+        <button 
+          onClick={onClose}
+          className="p-2 hover:bg-white rounded-full transition-colors"
+        >
+          <X size={16} />
+        </button>
+      </div>
+      <div className="overflow-y-auto max-h-[400px] divide-y divide-gray-100">
+        {notifications.length === 0 ? (
+          <div className="p-6 text-center">
+            <Bell size={24} className="text-gray-300 mx-auto mb-2" />
+            <p className="text-gray-500">No new notifications</p>
+          </div>
+        ) : (
+          notifications.map((notification) => (
+            <div
+              key={notification.id}
+              className="p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-start gap-3">
+                <div className={`p-2 rounded-full ${
+                  notification.status === 'success' ? 'bg-green-100' : 'bg-blue-100'
+                }`}>
+                  <Activity size={14} className={
+                    notification.status === 'success' ? 'text-green-600' : 'text-blue-600'
+                  } />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">{notification.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">#{notification.transactionId}</p>
+                  <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 };
 
-export default AudioBookDashboard;
+// Rest of the components remain the same...
+
+// Header Component
+const Header = ({ onNotificationClick, notificationCount }) => (
+  <header className="bg-white border-b border-gray-100">
+    <div className="max-w-7xl mx-auto px-8">
+      <div className="flex justify-between items-center h-20">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          PayFlow
+        </h1>
+        <div className="flex items-center gap-6">
+          <button
+            onClick={onNotificationClick}
+            className="p-3 hover:bg-gray-50 rounded-xl relative transition-colors"
+          >
+            <Bell size={20} className="text-gray-600" />
+            {notificationCount > 0 && (
+              <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {notificationCount}
+              </span>
+            )}
+          </button>
+          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 flex items-center justify-center">
+            <span className="text-white font-medium">JD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+);
+
+// Payment Card Component
+const PaymentCard = ({ onPayment }) => (
+  <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
+    <div className="flex items-start justify-between mb-8">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Quick Payment</h2>
+        <p className="text-gray-500">Complete your payment securely</p>
+      </div>
+      <div className="p-4 bg-blue-50 rounded-xl">
+        <CreditCard className="text-blue-600 w-6 h-6" />
+      </div>
+    </div>
+    <div className="space-y-6">
+      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-xl">
+        <p className="text-sm text-gray-600 mb-2">Amount Due</p>
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-bold text-gray-800">$299</span>
+          <span className="text-gray-500">.00</span>
+        </div>
+      </div>
+      <button
+        onClick={onPayment}
+        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+      >
+        <span className="flex items-center justify-center gap-2">
+          Pay Now
+          <ChevronRight size={16} />
+        </span>
+      </button>
+    </div>
+  </div>
+);
+
+// Recent Activity Component
+const RecentActivity = ({ notifications }) => (
+  <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="p-4 bg-indigo-50 rounded-xl">
+        <History className="text-indigo-600 w-6 h-6" />
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-800">Recent Activity</h2>
+        <p className="text-gray-500">Track your payment history</p>
+      </div>
+    </div>
+    <div className="space-y-4">
+      {notifications.slice(0, 3).map((notification) => (
+        <div
+          key={notification.id}
+          className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100"
+        >
+          <div className={`p-2 rounded-full ${
+            notification.status === 'success' ? 'bg-green-100' : 'bg-blue-100'
+          }`}>
+            <Activity size={16} className={
+              notification.status === 'success' ? 'text-green-600' : 'text-blue-600'
+            } />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-800">{notification.message}</p>
+            <p className="text-xs text-gray-500 mt-1">#{notification.transactionId}</p>
+          </div>
+          <span className="text-xs text-gray-400">{notification.timestamp}</span>
+        </div>
+      ))}
+      {notifications.length === 0 && (
+        <div className="text-center py-8">
+          <Activity size={32} className="text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">No recent activity</p>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// Main Component
+const PaymentWebsite = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3000');
+    setSocket(newSocket);
+
+    newSocket.on('transactionUpdate', (data) => {
+      addNotification(data);
+    });
+
+    return () => newSocket.disconnect();
+  }, []);
+
+  const addNotification = (data) => {
+    const newNotification = {
+      id: Date.now(),
+      message: data.message,
+      status: data.status,
+      transactionId: data.transactionId,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const handlePayment = () => {
+    const transactionId = `TXN${Date.now()}`;
+    socket?.emit('initiatePayment', {
+      transactionId,
+      amount: 299.00,
+      timestamp: new Date().toISOString()
+    });
+    
+    setTimeout(() => {
+      addNotification({
+        message: 'Payment initiated successfully',
+        status: 'pending',
+        transactionId
+      });
+    }, 500);
+
+    setTimeout(() => {
+      addNotification({
+        message: 'Payment processed successfully',
+        status: 'success',
+        transactionId
+      });
+    }, 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header 
+        onNotificationClick={() => setIsNotificationOpen(!isNotificationOpen)}
+        notificationCount={notifications.length}
+      />
+      
+      <main className="max-w-7xl mx-auto px-8 py-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          <PaymentCard onPayment={handlePayment} />
+          <RecentActivity notifications={notifications} />
+        </div>
+      </main>
+
+      <NotificationPopup
+        notifications={notifications}
+        isOpen={isNotificationOpen}
+        onClose={() => setIsNotificationOpen(false)}
+      />
+    </div>
+  );
+};
+
+export default PaymentWebsite;
