@@ -3,6 +3,22 @@ import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaHistory } from "react-icons/fa";
 import { UserCircle } from "lucide-react";
 
+// Function to convert paisa to rupees
+const convertToRupees = (paisa) => (paisa / 100).toFixed(2);
+
+// Function to format MongoDB date string into a readable format
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleString('en-IN', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+};
+
 const TransactionHistory = () => {
   const [transactions, setTransactions] = useState([]);
   const email = localStorage.getItem("email");
@@ -16,7 +32,7 @@ const TransactionHistory = () => {
       .catch((error) => {
         console.error('Failed to fetch transactions:', error);
       });
-  }, []);
+  }, [email]);
 
   return (
     <div className="h-screen w-full p-6">
@@ -47,9 +63,9 @@ const TransactionHistory = () => {
                       {/* Transaction Header */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
-                          {transaction.recipientImg ? (
+                          {transaction.profilePic ? (
                             <img
-                              src={transaction.recipientImg}
+                              src={transaction.profilePic}
                               alt={transaction.description}
                               className="w-12 h-12 rounded-full border-2 border-[#ffa3a3]"
                             />
@@ -58,20 +74,20 @@ const TransactionHistory = () => {
                           )}
                           <div>
                             <h3 className="text-lg font-semibold text-gray-800">
-                              {transaction.description}
+                              {transaction.name}
                             </h3>
-                            <p className="text-sm text-gray-500">{transaction.time}</p>
+                            <p className="text-sm text-gray-500">{formatDate(transaction.createdAt)}</p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-gray-800">
-                            {transaction.amount}
+                            {convertToRupees(transaction.amount)} INR
                           </p>
                           <div
                             className={`flex items-center justify-end gap-1 mt-1 ${
-                              transaction.status === "Completed"
+                              transaction.status === "successful"
                                 ? "text-green-600"
-                                : "text-yellow-600"
+                                : "text-blue-600"
                             }`}
                           >
                             <FaCheckCircle className="w-4 h-4" />
@@ -88,7 +104,7 @@ const TransactionHistory = () => {
                           <div>
                             <p className="text-gray-500">Transaction ID</p>
                             <p className="font-medium text-gray-800">
-                              {transaction.id}
+                              {transaction.orderId}
                             </p>
                           </div>
                           <div className="text-right">

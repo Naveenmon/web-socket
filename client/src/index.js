@@ -6,7 +6,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import PaymentLanding from './pages/LandingPage';
 import DashboardLayout from './pages/Dashboard';
 import Login from './pages/Login';
-import PrivateRoute from './Components/PrivateRoute';  // Assuming this component is implemented
+import PrivateRoute from './Components/PrivateRoute'; 
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const Client_ID = "996154890262-40uvga3154rat51jr30igg3ssbo8s57i.apps.googleusercontent.com";

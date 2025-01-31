@@ -4,10 +4,26 @@ import Message from '../Components/Message';
 import TransactionHistory from '../Components/TransactionHistory';
 import { Player } from '@lottiefiles/react-lottie-player';
 import lottieAnimation from '../assets/landing.json'; // 
+import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
+import { googleLogout } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardLayout = () => {
+  const name = localStorage.getItem('name');
+  const profilePic = localStorage.getItem('profilePic');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [currentRoute, setCurrentRoute] = useState('dashboard');
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    googleLogout(); 
+    localStorage.removeItem('name'); 
+    localStorage.removeItem('profilePic'); 
+    localStorage.removeItem('email');
+    navigate('/login'); 
+  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -45,7 +61,10 @@ const DashboardLayout = () => {
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="flex items-center justify-between p-4 border-b">
-          <h1 className="text-xl font-bold">Dashboard</h1>
+          <Link to={'/'}>
+            <img src={logo} width={40} height={40} alt="logo" />
+          </Link>
+          <h1 className="text-xl font-bold">AudioBook</h1>
           <button onClick={toggleSidebar} className="lg:hidden">
             <X className="h-6 w-6" />
           </button>
@@ -54,7 +73,7 @@ const DashboardLayout = () => {
           <button
             onClick={() => setCurrentRoute('messages')}
             className={`flex items-center space-x-3 w-full p-3 rounded-lg ${
-              currentRoute === 'messages' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
+              currentRoute === 'messages' ? 'bg-[#ffded9] text-black' : 'hover:bg-[#ffded9]'
             }`}
           >
             <MessageSquare className="h-5 w-5" />
@@ -63,7 +82,7 @@ const DashboardLayout = () => {
           <button
             onClick={() => setCurrentRoute('payments')}
             className={`flex items-center space-x-3 w-full p-3 rounded-lg mt-2 ${
-              currentRoute === 'payments' ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'
+              currentRoute === 'payments' ? 'bg-[#ffded9] text-black' : 'hover:bg-[#ffded9]'
             }`}
           >
             <CreditCard className="h-5 w-5" />
@@ -80,16 +99,27 @@ const DashboardLayout = () => {
             <button onClick={toggleSidebar} className="lg:hidden">
               <Menu className="h-6 w-6" />
             </button>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <Bell className="h-5 w-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-full">
-                <User className="h-5 w-5" />
+            
+            <div className="flex items-center space-x-4 ml-auto pr-8">
+              <img 
+                src={profilePic} 
+                alt="user" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-[#ffa3a3]" 
+              />
+              
+              <p className="font-semibold text-gray-800">{name}</p>
+
+              <button 
+                onClick={handleLogout}
+                className="bg-[#ffa3a3] text-white px-2 py-1 rounded-md hover:bg-[#ffb7b7] transition duration-300"
+              >
+                Logout
               </button>
             </div>
+
           </div>
         </header>
+
 
         {/* Content Area */}
         <main className="flex-1 overflow-auto flex justify-end">

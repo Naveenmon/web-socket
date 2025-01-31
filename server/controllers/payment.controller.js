@@ -29,6 +29,8 @@ const createOrder = async (req, res) => {
 
         const newTransaction = await collection.insertOne({
             email: req.body.email,
+            name: req.body.name,
+            profilePic: req.body.profilePic,
             amount: order.amount,
             orderId: order.id,
             status: order.status,
@@ -83,7 +85,7 @@ const captureOrder = async (req, res) => {
 
         const transaction = await collection.findOneAndUpdate(
             { orderId: order_id },
-            { $set: { status: 'completed' } },  // Use $set operator for updating the status
+            { $set: { status: 'successful' } },  // Use $set operator for updating the status
             { new: true }
         );
 

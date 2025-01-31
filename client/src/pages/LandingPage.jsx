@@ -12,8 +12,8 @@ const AudiobookLanding = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
-              <img src={logo} width={45} height={45} alt="" />
-              <span className="text-2xl p-2 font-bold">AudioVerse</span>
+              <img src={logo} width={40} height={40} alt="" />
+              <span className="text-2xl p-2 font-bold">AudioBook</span>
             </div>
             <div>
               <button className="bg-[#ffa3a3] text-gray-800 px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">

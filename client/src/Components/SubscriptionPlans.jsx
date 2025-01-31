@@ -25,11 +25,12 @@ const SubscriptionPlans = () => {
   const handleSubscription = async () => {
     const email = localStorage.getItem('email');
     const name = localStorage.getItem('name');
+    const profilePic = localStorage.getItem('profilePic');
     const roomId = email;
     const amount = 30000;
 
     try {
-        const res = await axios.post('http://localhost:3001/api/order/', { email, amount: 30000 });
+        const res = await axios.post('http://localhost:3001/api/order/', { email, name, profilePic, amount: 30000 });
         console.log('Order created', res.data);
 
         // Emit order initiated message
