@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { Check } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3001');
 
 const SubscriptionPlans = () => {
   const navigate = useNavigate();
@@ -22,10 +25,20 @@ const SubscriptionPlans = () => {
   const handleSubscription = async () => {
     const email = localStorage.getItem('email');
     const name = localStorage.getItem('name');
+    const roomId = email;
+    const amount = 30000;
 
     try {
-        const res = await axios.post('http://localhost:3001/api/order/', { email, amount: 1499 });
+        const res = await axios.post('http://localhost:3001/api/order/', { email, amount: 30000 });
         console.log('Order created', res.data);
+
+        // Emit order initiated message
+        socket.emit('newMessage', {
+          senderName: 'Payment System',
+          body: `Order #${res.data.id} created for ₹${res.data.amount/100}. Processing payment...`,
+          timestamp: new Date().toLocaleTimeString()
+        });
+
 
         const razorpayKey = process.env.RAZORPAY_KEY_ID;
         const amount = res.data.amount;
@@ -53,10 +66,27 @@ const SubscriptionPlans = () => {
                 })
                 .then(response => {
                     console.log('Payment captured successfully:', response.data);
+                    
+                    // Emit payment success message
+
+                    socket.emit('newMessage', {
+                      senderName: 'Payment System',
+                      body: `Payment of ₹${amount/100} completed successfully. Payment ID: ${paymentId}`,
+                      timestamp: new Date().toLocaleTimeString()
+                    });
+
                     navigate('/dashboard')
                 })
                 .catch(error => {
                     console.error('Error capturing payment:', error.response ? error.response.data : error.message);
+
+                    // Emit payment failure message
+                    socket.emit('newMessage', {
+                      senderName: 'Payment System',
+                      body: `Payment failed. Please try again.`,
+                      timestamp: new Date().toLocaleTimeString()
+                    });
+
                 });
             },
             prefill: {
