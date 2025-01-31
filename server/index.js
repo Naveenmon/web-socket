@@ -30,7 +30,6 @@ io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
   socket.on('newMessage', (message) => {
-    // Broadcast the message to all connected clients
     io.emit('newMessage', message);
 });
 

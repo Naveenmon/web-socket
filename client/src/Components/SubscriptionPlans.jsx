@@ -36,7 +36,7 @@ const SubscriptionPlans = () => {
         // Emit order initiated message
         socket.emit('newMessage', {
           senderName: name,
-          body: `Order #${res.data.id} created for ₹${res.data.amount/100}. Processing payment...`,
+          body: `Order #${res.data.id} initiated for ₹${res.data.amount/100}. Processing payment...`,
           timestamp: new Date().toLocaleTimeString()
         });
 

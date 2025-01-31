@@ -1,4 +1,4 @@
-import Razorpay from 'razorpay';  // Correct import for ES6 modules
+import Razorpay from 'razorpay';  
 import dotenv from 'dotenv';
 import connectDB from '../utils/db.js';
 
@@ -12,7 +12,7 @@ const razorpay = new Razorpay({
 const createOrder = async (req, res) => {
     try {
         const options = {
-            amount: req.body.amount,  // Amount in paise (for INR)
+            amount: req.body.amount,  
             currency: "INR",
             receipt: "12345",
         };
@@ -52,7 +52,7 @@ const captureOrder = async (req, res) => {
     console.log("Payload", payment_id, order_id, amount);
 
     try {
-        // Ensure razorpay is correctly initialized before using
+        
         if (!razorpay) {
             return res.status(500).json({ message: 'Razorpay client is not initialized' });
         }
@@ -69,7 +69,7 @@ const captureOrder = async (req, res) => {
 
             const transaction = await collection.findOneAndUpdate(
                 { orderId: order_id },
-                { $set: { status: "successful" } },  // Use $set operator for updating the status
+                { $set: { status: "successful" } }, 
                 { new: true }
             );
 
@@ -85,7 +85,7 @@ const captureOrder = async (req, res) => {
 
         const transaction = await collection.findOneAndUpdate(
             { orderId: order_id },
-            { $set: { status: 'successful' } },  // Use $set operator for updating the status
+            { $set: { status: 'successful' } },  
             { new: true }
         );
 
