@@ -34,7 +34,7 @@ const SubscriptionPlans = () => {
 
         // Emit order initiated message
         socket.emit('newMessage', {
-          senderName: 'Payment System',
+          senderName: name,
           body: `Order #${res.data.id} created for ₹${res.data.amount/100}. Processing payment...`,
           timestamp: new Date().toLocaleTimeString()
         });
@@ -70,7 +70,7 @@ const SubscriptionPlans = () => {
                     // Emit payment success message
 
                     socket.emit('newMessage', {
-                      senderName: 'Payment System',
+                      senderName: name,
                       body: `Payment of ₹${amount/100} completed successfully. Payment ID: ${paymentId}`,
                       timestamp: new Date().toLocaleTimeString()
                     });
@@ -82,7 +82,7 @@ const SubscriptionPlans = () => {
 
                     // Emit payment failure message
                     socket.emit('newMessage', {
-                      senderName: 'Payment System',
+                      senderName: name,
                       body: `Payment failed. Please try again.`,
                       timestamp: new Date().toLocaleTimeString()
                     });
