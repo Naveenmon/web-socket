@@ -93,7 +93,7 @@ const SubscriptionPlans = () => {
             prefill: {
                 name: name,
                 email: email,
-                contact: "9876543210",  // Use actual contact number
+                contact: "9876543210",  
             },
             theme: {
                 color: "#f58b8b",

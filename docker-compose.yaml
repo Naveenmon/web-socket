@@ -1,0 +1,43 @@
+version: '2.8'
+
+services:
+  # Frontend React application
+  client:
+    build:
+      context: ./client  # Path to the frontend directory
+    ports:
+      - "3000:80"  # Map the frontend's port (80) to your local port 3000
+    depends_on:
+      - server
+    networks:
+      - socket-network
+
+  # Backend Node.js API application
+  server:
+    build:
+      context: ./server  # Path to the backend directory
+    ports:
+      - "3001:3001"  # Map backend's port to your local port 5000
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/  # MongoDB connection URI
+    depends_on:
+      - mongo  # Ensure MongoDB is ready before starting backend
+    networks:
+      - socket-network
+
+  # MongoDB database
+  mongo:
+    image: mongo:latest  # Using official MongoDB image
+    ports:
+      - "27017:27017"  # Expose MongoDB port
+    volumes:
+      - mongo-data:/data/db  # Persistent data storage
+    networks:
+      - socket-network
+
+networks:
+  socket-network:
+    driver: bridge  # Use the default bridge network
+
+volumes:
+  mongo-data:  # Persist MongoDB data
